@@ -18,9 +18,11 @@ export async function GET(req: Request) {
       throw new Error(`API failed with status ${players.status}, response: ${await players.text()}`);
     }
 
-    console.log("test")
-    throw new Error(`${players}`)
     const playersJSON = await players.json();
+  
+    console.log("test")
+    throw new Error(playersJSON)
+    //const playersJSON = await players.json();
     return NextResponse.json(playersJSON.data);
 
   } catch (error) {
