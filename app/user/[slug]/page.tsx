@@ -5,7 +5,7 @@ import { FetchTankData } from '@/lib/fetchTankData'
 import { useState, useEffect } from 'react'
 
 export default function Page({ params }: { params: Promise<{ slug: string }> }) {
-    const [tanks, setTanks] = useState<unknown[]>([])
+    const [tanks, setTanks] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [nickname, setNickname] = useState<string | null>(null)
@@ -25,7 +25,7 @@ export default function Page({ params }: { params: Promise<{ slug: string }> }) 
 
                 // Fetch additional tank data for each tank
                 const updatedTanks = await Promise.all(
-                    tankData.map(async (tank) => {
+                    tankData.map(async (tank: { tank_id: string; }) => {
                         const tankStats = await FetchTankData(tank.tank_id)
                         return { ...tank, stats: tankStats }
                     })

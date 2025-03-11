@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { FetchUserData } from '@/lib/fetchUserData'; // Import from lib
 
 function SearchForUser({ onSearch }: { onSearch: (searchQuery: string) => void }) {
@@ -39,10 +39,10 @@ export default function Page() {
     try {
       const userData = await FetchUserData(searchQuery);
       setUsers(userData);
-      console.log(users.nickname);
-      if (users.nickname && users) {
-        console.log
-        router.push(`/user/${users.nickname}-${users.account_id}`);
+      if (userData.length > 0) {
+        const firstUser = userData[0]; // If there's only one user, use the first element
+        console.log(firstUser.nickname); // Access nickname of the first user
+        router.push(`/user/${firstUser.nickname}-${firstUser.account_id}`);
       }
     } catch (error) {
       console.error(error);
