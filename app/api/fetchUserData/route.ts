@@ -18,11 +18,6 @@ export async function GET(req: Request) {
     if (!playersJSON.data || playersJSON.data.length === 0) {
       return NextResponse.json({ error: 'No player data found' }, { status: 404 });
     }
-
-    if (playersJSON.data[0].nickname === searchQuery) {
-      console.log('find');
-      return NextResponse.json(playersJSON.data[0]);
-    }
     return NextResponse.json(playersJSON.data);
   } catch (error) {
     console.error('Error fetching player data:', error)

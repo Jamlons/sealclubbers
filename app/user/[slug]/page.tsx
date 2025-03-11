@@ -45,8 +45,6 @@ export default function Page({ params }: { params: Promise<{ slug: string }> }) 
     if (loading) return <div>Loading...</div>
     if (error) return <div>{error}</div>
 
-    console.log(tanks);
-
     return (
         <div>
             <h1>{nickname}</h1>
