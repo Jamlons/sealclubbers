@@ -39,6 +39,7 @@ export default function Page() {
     try {
       const userData = await FetchUserData(searchQuery);
       setUsers(userData);
+      console.log(users)
       if (userData.length > 0) {
         const firstUser = userData[0]; // If there's only one user, use the first element
         console.log(firstUser.nickname); // Access nickname of the first user

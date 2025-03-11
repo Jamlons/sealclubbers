@@ -15,10 +15,12 @@ export async function GET(req: Request) {
     const players = await fetch(`https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`);
     const playersJSON = await players.json();
     if (playersJSON.data[0].nickname === searchQuery) {
+      console.log('find');
       return NextResponse.json(playersJSON.data[0]);
     }
     return NextResponse.json(playersJSON.data);
   } catch (error) {
+    console.log(error);
     return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
   }
 }
