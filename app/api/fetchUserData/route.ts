@@ -22,7 +22,6 @@ export async function GET(req: Request) {
     }
     return NextResponse.json(playersJSON.data);
   } catch (error) {
-    console.log(error);
-    return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
+    return NextResponse.json({ error: `https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}` }, { status: 500 });
   }
 }
