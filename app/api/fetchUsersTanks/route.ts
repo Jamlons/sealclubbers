@@ -13,7 +13,13 @@ export async function GET(req: Request) {
     const playerData = await fetch(`https://api.worldoftanks.asia/wot/account/tanks/?application_id=3b261491699b1febc9a68a1b3e6c7052&account_id=${playerID}`) 
     const playerDataJSON = await playerData.json();
 
-    return NextResponse.json(playerDataJSON.data[playerID]);
+    const response = NextResponse.json(playerDataJSON.data[playerID]);
+    response.headers.set('Access-Control-Allow-Origin', '*'); // Allow all origins or replace '*' with specific origin for security
+    response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+
+    return response;
 
   } catch (error) {
     console.log(error);
