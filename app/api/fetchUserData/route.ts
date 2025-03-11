@@ -12,17 +12,22 @@ export async function GET(req: Request) {
   }
 
   try {
-    const players = await fetch(`https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`);
+    const response = await fetch(
+      `https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`,
+      { headers: { 'User-Agent': 'Mozilla/5.0' } }
+    );
 
-    if (!players.ok) {
-      throw new Error(`API failed with status ${players.status}, response: ${await players.text()}`);
-    }
+    // Convert headers to a JSON-friendly format
+    const headersObj = Object.fromEntries(response.headers.entries());
+    const responseBody = await response.text(); // Read response as text
 
-    const playersJSON = await players.json();
-    return NextResponse.json(playersJSON.data);
-
+    return NextResponse.json({
+      success: response.ok,
+      status: response.status,
+      headers: headersObj,
+      body: responseBody.length > 0 ? JSON.parse(responseBody) : 'No response body'
+    });
   } catch (error) {
-    console.error('Error fetching player data:', error)
-    return NextResponse.json({ error: error }, { status: 500 });
+    return NextResponse.json({ error: "error" }, { status: 500 });
   }
 }
