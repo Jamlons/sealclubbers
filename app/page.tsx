@@ -1,15 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { FetchUserData } from '@/lib/fetchUserData'; // Import from lib
 
-// Function to fetch user data based on search query
-async function FetchUserData(searchQuery: string) {
-  const data = await fetch(`https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`);
-  const users = await data.json();
-  return users.data;
-}
-
-// Search logic to handle the input change and submit
 function SearchForUser({ onSearch }: { onSearch: (searchQuery: string) => void }) {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -19,7 +13,7 @@ function SearchForUser({ onSearch }: { onSearch: (searchQuery: string) => void }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(searchQuery); // Call the parent function to handle the search
+    onSearch(searchQuery);
   };
 
   return (
@@ -38,27 +32,38 @@ function SearchForUser({ onSearch }: { onSearch: (searchQuery: string) => void }
 export default function Page() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSearch = async (searchQuery: string) => {
     setLoading(true);
-    const userData = await FetchUserData(searchQuery); // Fetch user data based on the search query
-    setUsers(userData);
+    try {
+      const userData = await FetchUserData(searchQuery);
+      setUsers(userData);
+      console.log(users.nickname);
+      if (users.nickname && users) {
+        console.log
+        router.push(`/user/${users.nickname}-${users.account_id}`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
     setLoading(false);
   };
 
-  let load = '';
-  if (loading) {
-    load = "Loading...";
-  }
-
   return (
     <div>
-      {load}
+      {loading && <p>Loading...</p>}
       <SearchForUser onSearch={handleSearch} />
       <ul>
-        {users.map((user) => (
-          <li key={user.account_id}>{user.nickname}</li>
-        ))}
+        {users.length > 0 ? (
+          users.map((user, index) => (
+            <li key={index}>
+              Nickname: {user.nickname}, Account ID: {user.account_id}
+            </li>
+          ))
+        ) : (
+          <p>No users found.</p>
+        )}
       </ul>
     </div>
   );
