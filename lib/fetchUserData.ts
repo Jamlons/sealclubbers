@@ -10,4 +10,3 @@ export async function FetchUserData(searchQuery: string) {
   }
   return response.json();
 }
-  
