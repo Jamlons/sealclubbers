@@ -14,10 +14,6 @@ export async function GET(req: Request) {
   try {
     const players = await fetch(`https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`);
     const playersJSON = await players.json();
-
-    if (!playersJSON.data || playersJSON.data.length === 0) {
-      return NextResponse.json({ error: 'No player data found' }, { status: 404 });
-    }
     return NextResponse.json(playersJSON.data);
   } catch (error) {
     console.error('Error fetching player data:', error)
