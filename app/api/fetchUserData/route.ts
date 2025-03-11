@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+// Returns nickname and account_id of players.
+// If nickname is an identical match, return only the matched player.
+// Otherwise, return list of all players.
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const searchQuery = searchParams.get('query');
@@ -9,22 +12,17 @@ export async function GET(req: Request) {
   }
 
   try {
-    const response = await fetch(
-      `https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`,
-      { headers: { 'User-Agent': 'Mozilla/5.0' } } // Sometimes APIs reject default fetch requests
-    );
+    const players = await fetch(`https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`);
 
-    if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
+    if (!players.ok) {
+      throw new Error(`API failed with status ${players.status}, response: ${await players.text()}`);
     }
 
-    const playersJSON = await response.json();
-    
-    const res = NextResponse.json(playersJSON.data);
-    res.headers.set('Access-Control-Allow-Origin', '*'); // Add CORS
-    return res;
+    const playersJSON = await players.json();
+    return NextResponse.json(playersJSON.data);
+
   } catch (error) {
-    console.error('Error fetching player data:', error);
-    return NextResponse.json({ error: "error" }, { status: 500 });
+    console.error('Error fetching player data:', error)
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }
