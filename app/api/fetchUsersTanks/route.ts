@@ -9,6 +9,7 @@ export async function GET(req: Request) {
   }
 
   try {
+    console.log("test")
     const playerData = await fetch(`https://api.worldoftanks.asia/wot/account/tanks/?application_id=3b261491699b1febc9a68a1b3e6c7052&account_id=${playerID}`) 
     const playerDataJSON = await playerData.json();
 
