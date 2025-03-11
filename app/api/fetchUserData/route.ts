@@ -12,7 +12,9 @@ export async function GET(req: Request) {
   }
 
   try {
+    console.log("getting data")
     const players = await fetch(`https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`);
+    console.log("fetched data")
     const playersJSON = await players.json();
     if (playersJSON.data[0].nickname === searchQuery) {
       console.log('find');
