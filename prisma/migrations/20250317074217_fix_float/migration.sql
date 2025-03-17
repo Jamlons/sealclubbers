@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "UserTankStats" ALTER COLUMN "hitsPercent" SET DATA TYPE DOUBLE PRECISION;

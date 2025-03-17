@@ -5,7 +5,7 @@ import axios from "axios";
 dotenv.config();
 
 const prisma = new PrismaClient();
-const API_KEY = "3b261491699b1febc9a68a1b3e6c7052";
+const API_KEY = process.env.WOT_APPLICATION_ID_ASIA;
 const BASE_URL = "https://api.worldoftanks.asia/wot/encyclopedia/vehicles/";
 
 async function fetchTankData() {
