@@ -74,4 +74,7 @@ model UserTankStats {
   survivedBattles Int
 
   createdAt Int
+
+  @@unique([accountId, tankId, numBattles])
+  @@index([accountId, tankId])
 }
