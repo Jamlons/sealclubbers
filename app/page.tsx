@@ -3,6 +3,24 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FetchUserData } from '@/lib/fetchUserData'; // Import from lib
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  const allUsers = await prisma.user.findMany()
+  console.log(allUsers)
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
 
 function SearchForUser({ onSearch }: { onSearch: (searchQuery: string) => void }) {
   const [searchQuery, setSearchQuery] = useState('');
