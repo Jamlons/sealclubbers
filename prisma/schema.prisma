@@ -33,6 +33,13 @@ model Tank {
   contour_icon String
   description String
 
+  // For use in WN8 calculation
+  expDef Float @default(0)
+  expFrag Float @default(0)
+  expSpot Float @default(0)
+  expDamage Float @default(0)
+  expWinRate Float @default(0)
+
   userStats UserTankStats[]
 }
 
