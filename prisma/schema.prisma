@@ -17,7 +17,7 @@ datasource db {
 // Specific User
 model User {
   accountId Int @id
-  nickname String
+  nickname String @unique
   userStats UserTankStats[]
 }
 
@@ -47,7 +47,7 @@ model UserTankStats {
   tankId Int
 
   markOfMastery Int
-  avgXp Int
+  totXp Int // Total XP
   numBattles Int
   // Used for WN8 Calculation
   draws Int
@@ -57,10 +57,14 @@ model UserTankStats {
   spots Int
   frags Int
   capPointsDropped Int
-
+  // Maximum of several
   maxDmg Int
   maxFrag Int
   maxXp Int
+  // Some more helpful data
+  assisted Int // stun + track + radio assisted damage
+  hitsPercent Float // hits / shots
+  survivedBattles Int
 
   createdAt Int
 }

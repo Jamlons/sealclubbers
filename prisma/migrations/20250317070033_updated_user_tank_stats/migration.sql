@@ -27,7 +27,7 @@ CREATE TABLE "UserTankStats" (
     "accountId" INTEGER NOT NULL,
     "tankId" INTEGER NOT NULL,
     "markOfMastery" INTEGER NOT NULL,
-    "avgXp" INTEGER NOT NULL,
+    "totXp" INTEGER NOT NULL,
     "numBattles" INTEGER NOT NULL,
     "draws" INTEGER NOT NULL,
     "wins" INTEGER NOT NULL,
@@ -39,10 +39,16 @@ CREATE TABLE "UserTankStats" (
     "maxDmg" INTEGER NOT NULL,
     "maxFrag" INTEGER NOT NULL,
     "maxXp" INTEGER NOT NULL,
+    "assisted" INTEGER NOT NULL,
+    "hitsPercent" INTEGER NOT NULL,
+    "survivedBattles" INTEGER NOT NULL,
     "createdAt" INTEGER NOT NULL,
 
     CONSTRAINT "UserTankStats_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_nickname_key" ON "User"("nickname");
 
 -- AddForeignKey
 ALTER TABLE "UserTankStats" ADD CONSTRAINT "UserTankStats_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "User"("accountId") ON DELETE RESTRICT ON UPDATE CASCADE;
