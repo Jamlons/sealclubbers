@@ -14,7 +14,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Specific User
 model User {
   accountId Int @id
   nickname String
+  userStats UserTankStats[]
+}
+
+// Details of a specific tank
+model Tank {
+  tankId Int @id
+  name String
+  shortName String
+  nation String
+  tier Int
+  type String
+  big_icon String
+  contour_icon String
+  description String
+
+  userStats UserTankStats[]
+}
+
+// Users battle statistics in different tanks.
+model UserTankStats {
+  id Int @id @default(autoincrement())
+
+  user User @relation(fields: [accountId], references: [accountId]) 
+  accountId Int
+
+  tankDetails Tank @relation(fields: [tankId], references: [tankId])
+  tankId Int
+
+  markOfMastery Int
+  avgXp Int
+  numBattles Int
+  // Used for WN8 Calculation
+  draws Int
+  wins Int
+  losses Int
+  dmgDealt Int
+  spots Int
+  frags Int
+  capPointsDropped Int
+
+  maxDmg Int
+  maxFrag Int
+  maxXp Int
+
+  createdAt Int
 }
