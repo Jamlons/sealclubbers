@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server';
-import { endpoint } from '@/utils/endpoint';
-import fetchAndSaveUserBattleData from '@/lib/fetchUserBattles';
+import fetchAndSaveUserBattleData from '@/lib/updateUsersBattles.js';
 
 /**
- * Handles GET requests to fetch user data.
+ * Handles GET requests to fetch User.
  */
 export async function GET(request: Request) {
   try {
@@ -11,26 +10,33 @@ export async function GET(request: Request) {
     const searchQuery = searchParams.get('query');
 
     if (!searchQuery) {
-      return new NextResponse(JSON.stringify({ error: 'Missing query parameter' }), {
+      return new NextResponse(JSON.stringify({ message: 'Missing query parameter' }), {
         status: 400,
         headers: corsHeaders,
       });
     }
 
-    const response = await fetchAndSaveUserBattleData(searchQuery);
+    let account_id_int = Number(searchQuery);
+    if (isNaN(account_id_int)) {
+        return new NextResponse(JSON.stringify({ message: 'Account ID passed is not a number.' }), {
+            status: 400,
+            headers: corsHeaders,
+        });
+    }
+    
+    const response = await fetchAndSaveUserBattleData(account_id_int);
 
-    if (!response.ok) {
-      return new NextResponse(JSON.stringify(response), {
+    if (response.status === "error") {
+      return new NextResponse(JSON.stringify({ message: response.message}), {
         status: 500,
         headers: corsHeaders,
       });
     }
-
-    const data = await response.json();
-    return new NextResponse(JSON.stringify(data), { status: 200, headers: corsHeaders });
+    
+    return new NextResponse(JSON.stringify(response.message), { status: 200, headers: corsHeaders });
 
   } catch (error) {
-    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), {
+    return new NextResponse(JSON.stringify({ message: 'Internal Server Error' }), {
       status: 500,
       headers: corsHeaders,
     });

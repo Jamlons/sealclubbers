@@ -7,31 +7,30 @@ import { endpoint } from '@/utils/endpoint'; // Import endpoint
 export default function SearchPage() {
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const response = await fetch(`${endpoint}/api/fetchUserData?query=${nickname}`);
+      const response = await fetch(`${endpoint}/api/fetchUser?query=${nickname}`);
       const data = await response.json();
 
-      if (data.status === 'ok') {
-        console.log('okay');
-        // If the API returns 'ok', redirect to the user's page
-        router.push(`${endpoint}/user/${nickname}-${data.message}`);
-      } else if (data.status === 'error') {
-        // If the API returns 'error', display the error message
+      if (response.status === 200) {
+        router.push(`${endpoint}/user/${nickname}-${data.accountId}`);
+      } else if (response.status === 500 || response.status === 400) {
         setError(data.message);
       }
     } catch (error) {
       setError('An error occurred while fetching the user data.');
-      console.error(error);
     }
   };
 
   return (
     <div>
+      {loading && <p>Loading...</p>}
       <form onSubmit={handleSearch}>
         <input
           type="text"

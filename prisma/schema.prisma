@@ -1,80 +1,66 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters", "postgresqlExtensions"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  extensions = [citext]
 }
 
-// Specific User
 model User {
-  accountId Int @id
-  nickname String @unique
+  accountId Int             @id
+  nickname  String          @unique @db.Citext
   userStats UserTankStats[]
+
+  @@index([accountId])
 }
 
-// Details of a specific tank
 model Tank {
-  tankId Int @id
-  name String
-  shortName String
-  nation String
-  tier Int
-  type String
-  big_icon String
+  tankId       Int             @id
+  name         String
+  shortName    String
+  nation       String
+  tier         Int
+  type         String
+  big_icon     String
   contour_icon String
-  description String
+  description  String
+  expDamage    Float           @default(0)
+  expDef       Float           @default(0)
+  expFrag      Float           @default(0)
+  expSpot      Float           @default(0)
+  expWinRate   Float           @default(0)
+  userStats    UserTankStats[]
 
-  // For use in WN8 calculation
-  expDef Float @default(0)
-  expFrag Float @default(0)
-  expSpot Float @default(0)
-  expDamage Float @default(0)
-  expWinRate Float @default(0)
-
-  userStats UserTankStats[]
+  @@index([tankId])
 }
 
-// Users battle statistics in different tanks.
 model UserTankStats {
-  id Int @id @default(autoincrement())
-
-  user User @relation(fields: [accountId], references: [accountId]) 
-  accountId Int
-
-  tankDetails Tank @relation(fields: [tankId], references: [tankId])
-  tankId Int
-
-  markOfMastery Int
-  totXp Int // Total XP
-  numBattles Int
-  // Used for WN8 Calculation
-  draws Int
-  wins Int
-  losses Int
-  dmgDealt Int
-  spots Int
-  frags Int
+  id               Int   @id @default(autoincrement())
+  accountId        Int
+  tankId           Int
+  markOfMastery    Int
+  totXp            Int
+  numBattles       Int
+  draws            Int
+  wins             Int
+  losses           Int
+  dmgDealt         Int
+  spots            Int
+  frags            Int
   capPointsDropped Int
-  wn8 Int @default(0)
-  // Maximum of several
-  maxDmg Int
-  maxFrag Int
-  maxXp Int
-  // Some more helpful data
-  assisted Int // stun + track + radio assisted damage
-  hitsPercent Float // hits / shots
-  survivedBattles Int
-
-  createdAt Int
+  maxDmg           Int
+  maxFrag          Int
+  maxXp            Int
+  assisted         Int
+  hitsPercent      Float
+  survivedBattles  Int
+  createdAt        Int
+  wn8              Int   @default(0)
+  user             User  @relation(fields: [accountId], references: [accountId])
+  tankDetails      Tank  @relation(fields: [tankId], references: [tankId])
 
   @@unique([accountId, tankId, numBattles])
   @@index([accountId, tankId])
