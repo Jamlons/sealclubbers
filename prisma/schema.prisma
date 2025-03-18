@@ -19,6 +19,8 @@ model User {
   accountId Int @id
   nickname String @unique
   userStats UserTankStats[]
+
+  @@index([accountId])
 }
 
 // Details of a specific tank
@@ -41,6 +43,8 @@ model Tank {
   expWinRate Float @default(0)
 
   userStats UserTankStats[]
+
+  @@index([tankId])
 }
 
 // Users battle statistics in different tanks.

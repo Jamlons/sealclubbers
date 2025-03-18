@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import fetchAndSaveUserBattleData from '@/lib/updateUsersBattles.js';
+import fetchUserBattles from '@/lib/fetchUserBattles.js';
 
 /**
- * Handles GET requests to fetch user data.
+ * Handles GET requests to fetch user battles.
  */
 export async function GET(request: Request) {
   try {
@@ -10,13 +10,13 @@ export async function GET(request: Request) {
     const searchQuery = searchParams.get('query');
 
     if (!searchQuery) {
-      return new NextResponse(JSON.stringify({ error: 'Missing query parameter' }), {
+      return new NextResponse(JSON.stringify({ message: 'Missing query parameter' }), {
         status: 400,
         headers: corsHeaders,
       });
     }
 
-    const response = await fetchAndSaveUserBattleData(searchQuery);
+    const response = await fetchUserBattles(searchQuery);
 
     if (response.status === "error") {
       return new NextResponse(JSON.stringify(response), {
@@ -24,11 +24,11 @@ export async function GET(request: Request) {
         headers: corsHeaders,
       });
     }
-
+    
     return new NextResponse(JSON.stringify(response), { status: 200, headers: corsHeaders });
 
   } catch (error) {
-    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), {
+    return new NextResponse(JSON.stringify({ message: 'Internal Server Error' }), {
       status: 500,
       headers: corsHeaders,
     });

@@ -1,60 +1,78 @@
 'use client';
 
-import { FetchUsersTanks } from '@/lib/fetchUsersTanks'
-import { FetchTankData } from '@/lib/fetchTankData'
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import { endpoint } from '@/utils/endpoint';
 
 export default function Page({ params }: { params: Promise<{ slug: string }> }) {
-    const [tanks, setTanks] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-    const [nickname, setNickname] = useState<string | null>(null)
-    const [accountId, setAccountId] = useState<string | null>(null)
+    const [battles, setBattles] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [nickname, setNickname] = useState<string | null>(null);
+    const [accountId, setAccountId] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
+            setError(null);
+
             try {
-                // Resolve the params promise to get slug
-                const { slug } = await params
-                const [nickname, account_id] = slug.split('-')
-                setNickname(nickname)
-                setAccountId(account_id)
+                const { slug } = await params;
+                const [nickname, account_id] = slug.split('-');
+                setNickname(nickname);
+                setAccountId(account_id);
 
-                // Fetch the tank data
-                const tankData = await FetchUsersTanks(account_id)
+                const response = await fetch(`${endpoint}/api/fetchUserBattles?query=${account_id}`);
+                const battleList = await response.json();
 
-                // Fetch additional tank data for each tank
-                const updatedTanks = await Promise.all(
-                    tankData.map(async (tank: { tank_id: string; }) => {
-                        const tankStats = await FetchTankData(tank.tank_id)
-                        return { ...tank, stats: tankStats }
-                    })
-                )
+                console.log(battleList.message);
+                console.log(battleList.status);
 
-                setTanks(updatedTanks)
+                if (battleList.status === 'error') {
+                    setError(battleList.message); 
+                    return;
+                } else {
+                    setBattles(battleList.message); 
+                    return
+                }
             } catch (err) {
-                setError('Failed to load data')
+                setError('Failed to load data');
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        }
+        };
 
-        fetchData()
-    }, [params])  // Use the `params` dependency to trigger the effect
+        fetchData();
+    }, [params]);  
 
-    if (loading) return <div>Loading...</div>
-    if (error) return <div>{error}</div>
+    if (loading) {
+        console.log('loading found');
+        return <div>Loading...</div>;
+    }
+    if (error) {
+        console.log('error found');
+        return <div>{error}</div>;
+    }
 
     return (
         <div>
             <h1>{nickname}</h1>
             <ul>
-                {tanks.map((tank) => (
-                    <li key={tank.tank_id}>
-                        Tank: {tank.stats[tank.tank_id].short_name} Win-Rate: {((tank.statistics.wins / tank.statistics.battles) * 100).toFixed(2)}% WN8: 
+                {battles.map((battle) => (
+                    <li key={battle.tank_id}>
+                        Nation: {battle.tankDetails.nation} 
+                        Type: {battle.tankDetails.type} 
+                        Tier: {battle.tankDetails.tier} 
+                        <img src={battle.tankDetails.contour_icon}/> 
+                        Tank: {battle.tankDetails.name} 
+                        Games: {battle.numBattles} 
+                        WN8: {battle.wn8} 
+                        WR: {battle.wins / battle.numBattles} 
+                        DPG: {battle.dmgDealt / battle.numBattles} 
+                        Frags: {battle.frags / battle.numBattles} 
+                        MOE: {battle.markOfMastery} 
                     </li>
                 ))}
             </ul>
         </div>
-    )
+    );
 }
