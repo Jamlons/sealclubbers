@@ -1,36 +1,55 @@
 import { NextResponse } from 'next/server';
+import { endpoint } from '@/utils/endpoint';
+import fetchAndSaveUserBattleData from '@/lib/fetchUserBattles';
 
-// Returns nickname and account_id of players.
-// If nickname is an identical match, return only the matched player.
-// Otherwise, return list of all players.
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const searchQuery = searchParams.get('query');
-
-  if (!searchQuery) {
-    return NextResponse.json({ error: 'Missing search query' }, { status: 400 });
-  }
-
+/**
+ * Handles GET requests to fetch user data.
+ */
+export async function GET(request: Request) {
   try {
-    const players = await fetch(`https://api.worldoftanks.asia/wot/account/list/?application_id=3b261491699b1febc9a68a1b3e6c7052&search=${searchQuery}`);
+    const { searchParams } = new URL(request.url);
+    const searchQuery = searchParams.get('query');
 
-    if (!players.ok) {
-      throw new Error(`API failed with status ${players.status}, response: ${await players.text()}`);
+    if (!searchQuery) {
+      return new NextResponse(JSON.stringify({ error: 'Missing query parameter' }), {
+        status: 400,
+        headers: corsHeaders,
+      });
     }
 
-    const playersJSON = await players.json();
+    const response = await fetchAndSaveUserBattleData(searchQuery);
 
-    // Create response with CORS headers
-    const response = NextResponse.json(playersJSON.data);  // Pass only the data as the body of the response
-    response.headers.set('Access-Control-Allow-Origin', '*'); // Allow all origins or replace '*' with specific origin for security
-    response.headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    response.headers.set('Access-Control-Allow-Credentials', 'true');
+    if (!response.ok) {
+      return new NextResponse(JSON.stringify(response), {
+        status: 500,
+        headers: corsHeaders,
+      });
+    }
 
-    return response;
+    const data = await response.json();
+    return new NextResponse(JSON.stringify(data), { status: 200, headers: corsHeaders });
 
   } catch (error) {
-    console.error('Error fetching player data:', error);
-    return NextResponse.json({ error: error }, { status: 500 });
+    return new NextResponse(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: corsHeaders,
+    });
   }
 }
+
+/**
+ * Handles preflight CORS requests.
+ */
+export function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
+/**
+ * CORS headers to allow cross-origin requests.
+ */
+const corsHeaders = new Headers({
+  'Access-Control-Allow-Origin': '*', // Change '*' to specific origin for security
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Credentials': 'true',
+});

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "UserTankStats" ADD COLUMN     "wn8" INTEGER NOT NULL DEFAULT 0;

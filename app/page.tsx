@@ -1,88 +1,47 @@
-'use client';
+'use client'
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FetchUserData } from '@/lib/fetchUserData'; // Import from lib
-import { PrismaClient } from '@prisma/client'
+import { endpoint } from '@/utils/endpoint'; // Import endpoint
 
-const prisma = new PrismaClient()
-
-async function main() {
-  const allUsers = await prisma.user.findMany()
-  console.log(allUsers)
-}
-
-main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
-
-function SearchForUser({ onSearch }: { onSearch: (searchQuery: string) => void }) {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(searchQuery);
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={handleInputChange}
-        placeholder="Search for a user"
-      />
-      <button type="submit">Search</button>
-    </form>
-  );
-}
-
-export default function Page() {
-  const [users, setUsers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+export default function SearchPage() {
+  const [nickname, setNickname] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSearch = async (searchQuery: string) => {
-    setLoading(true);
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     try {
-      const userData = await FetchUserData(searchQuery);
-      setUsers(userData);
-      if (userData[0].nickname === searchQuery) {
-        const firstUser = userData[0]; // If there's only one user, use the first element
-        console.log(firstUser.nickname); // Access nickname of the first user
-        router.push(`/user/${firstUser.nickname}-${firstUser.account_id}`);
+      const response = await fetch(`${endpoint}/api/fetchUserData?query=${nickname}`);
+      const data = await response.json();
+
+      if (data.status === 'ok') {
+        console.log('okay');
+        // If the API returns 'ok', redirect to the user's page
+        router.push(`${endpoint}/user/${nickname}-${data.message}`);
+      } else if (data.status === 'error') {
+        // If the API returns 'error', display the error message
+        setError(data.message);
       }
     } catch (error) {
+      setError('An error occurred while fetching the user data.');
       console.error(error);
     }
-    setLoading(false);
   };
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
-      <SearchForUser onSearch={handleSearch} />
-      <ul>
-        {users.length > 0 ? (
-          users.map((user, index) => (
-            <li key={index}>
-              Nickname: {user.nickname}, Account ID: {user.account_id}
-            </li>
-          ))
-        ) : (
-          <p>No users found.</p>
-        )}
-      </ul>
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          placeholder="Enter nickname"
+        />
+        <button type="submit">Search</button>
+      </form>
+      {error && <p>{error}</p>}
     </div>
   );
 }

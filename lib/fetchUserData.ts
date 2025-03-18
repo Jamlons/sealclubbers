@@ -1,8 +1,9 @@
 import { endpoint } from '@/utils/endpoint'
+const fetchAndSaveUserBattleData =  require('./fetchUserBattles.js');
 
 export async function FetchUserData(searchQuery: string) {
 
-  const response = await fetch(`${endpoint}/api/fetchUserData?query=${searchQuery}`);
+  const response = fetchAndSaveUserBattleData(searchQuery);
 
   if (!response.ok) {
     throw new Error(`${endpoint}/api/fetchUserData?query=${searchQuery}`);

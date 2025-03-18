@@ -64,6 +64,7 @@ model UserTankStats {
   spots Int
   frags Int
   capPointsDropped Int
+  wn8 Int @default(0)
   // Maximum of several
   maxDmg Int
   maxFrag Int
@@ -74,4 +75,7 @@ model UserTankStats {
   survivedBattles Int
 
   createdAt Int
+
+  @@unique([accountId, tankId, numBattles])
+  @@index([accountId, tankId])
 }
