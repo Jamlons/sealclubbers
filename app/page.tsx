@@ -18,11 +18,9 @@ export default function SearchPage() {
       const response = await fetch(`${endpoint}/api/fetchUser?query=${nickname}`);
       const data = await response.json();
 
-      console.log(data);
-
-      if (data.status === 'ok') {
-        router.push(`${endpoint}/user/${nickname}-${data.message.accountId}`);
-      } else if (data.status === 'error') {
+      if (response.status === 200) {
+        router.push(`${endpoint}/user/${nickname}-${data.accountId}`);
+      } else if (response.status === 500 || response.status === 400) {
         setError(data.message);
       }
     } catch (error) {

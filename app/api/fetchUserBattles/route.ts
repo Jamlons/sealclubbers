@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const searchQuery = searchParams.get('query');
+    let accountId = 0;
 
     if (!searchQuery) {
       return new NextResponse(JSON.stringify({ message: 'Missing query parameter' }), {
@@ -16,16 +17,25 @@ export async function GET(request: Request) {
       });
     }
 
-    const response = await fetchUserBattles(searchQuery);
+    accountId = Number(searchQuery);
+
+    if (isNaN(accountId)) {
+      return new NextResponse(JSON.stringify({ message: 'Given query parameter is not a number.'}), {
+        status: 400,
+        headers: corsHeaders,
+      });
+    }
+
+    const response = await fetchUserBattles(accountId);
 
     if (response.status === "error") {
-      return new NextResponse(JSON.stringify(response), {
+      return new NextResponse(JSON.stringify({message: response.message}), {
         status: 500,
         headers: corsHeaders,
       });
     }
     
-    return new NextResponse(JSON.stringify(response), { status: 200, headers: corsHeaders });
+    return new NextResponse(JSON.stringify({message: response.message}), { status: 200, headers: corsHeaders });
 
   } catch (error) {
     return new NextResponse(JSON.stringify({ message: 'Internal Server Error' }), {

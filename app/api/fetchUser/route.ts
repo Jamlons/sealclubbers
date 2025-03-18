@@ -19,13 +19,13 @@ export async function GET(request: Request) {
     const response = await fetchUser(searchQuery);
 
     if (response.status === "error") {
-      return new NextResponse(JSON.stringify(response), {
+      return new NextResponse(JSON.stringify({ message: response.message}), {
         status: 500,
         headers: corsHeaders,
       });
     }
     
-    return new NextResponse(JSON.stringify(response), { status: 200, headers: corsHeaders });
+    return new NextResponse(JSON.stringify(response.message), { status: 200, headers: corsHeaders });
 
   } catch (error) {
     return new NextResponse(JSON.stringify({ message: 'Internal Server Error' }), {
